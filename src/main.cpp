@@ -1,18 +1,29 @@
 #include <Arduino.h>
 #include <Servo.h>
+#include <max6675.h>
 
-int TRIG=10;
-int ECO=6;
-int LED=10;
+//SENSOR DE TEMPERATURA 
+int ktc50=9;
+int ktcCS=11;
+int ktcCLK=12;
+MAX6675 KTC(ktc50,ktcCLK,ktcCS);
+float temp_current;
+float temp_ref= 300;
+float umbral=50;
+int greca=8;
+
+int TRIG=10;// sensor hc-sr
+int ECO=6;// sensor hc-sr
+int LED=10;// sensor hc-sr
 
 int boton;
 bool door1=true;
 bool door2=true;
 bool door3=true;
 bool flag= true;
-float temp_current;
-float temp_ref= 300;
-float umbral=50;
+
+
+
 
 float dist_pared = 15; //ojo definir en el experimento
 int t1=20; // definir en el experimento
@@ -41,10 +52,22 @@ void setup() {
   //sensor hc-sr04
   servomotor.attach(10, pulsemin, pulsemax); //verificar pin disponible para el servo
   servomotor.write(pos_inicial);
-  pinMode(8, OUTPUT);
+  pinMode(greca, OUTPUT);
   pinMode(7, OUTPUT);
   pinMode(4, INPUT);
   t_init = millis();
+}
+void calefaccion  (){
+  temp_current =KTC.readCelsius();
+  if (temp_current<(temp_ref-umbral))
+  {
+    digitalWrite(greca, HIGH);
+    /* code */
+  } else{
+    digitalWrite(greca, LOW);
+
+  }
+  
 }
 
 void loop() {
