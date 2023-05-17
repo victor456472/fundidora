@@ -16,6 +16,8 @@ int TRIG=10;// sensor hc-sr
 int ECO=6;// sensor hc-sr
 int LED=10;// sensor hc-sr
 
+float ventana; 
+
 int boton;
 bool door1=true;
 bool door2=true;
@@ -45,6 +47,12 @@ int pos_final = 180; //definir en el experimento
 
 Servo servomotor;
 
+//counter mucrosegundos
+
+unsigned long t_init_mcs;
+unsigned long t_current_mcs;
+unsigned long period_mcs = 1000;
+
 void setup() {
   pinMode(TRIG,OUTPUT );
   pinMode(ECO,INPUT );
@@ -56,6 +64,18 @@ void setup() {
   pinMode(7, OUTPUT);
   pinMode(4, INPUT);
   t_init = millis();
+  //variable para lectura del sensor ultrasonico
+  t_init_mcs = micros();
+}
+
+void leer_sensor_ultrasonico(){
+  t_current_mcs=micros();
+  digitalWrite(TRIG, HIGH);
+  if((t_current_mcs - t_init_mcs) >= period_mcs){
+    digitalWrite(TRIG, LOW);
+    ventana = pulseIn(ECO, HIGH)/58.2;
+    t_init_mcs=t_current_mcs;
+  }
 }
 void calefaccion  (){
   temp_current =KTC.readCelsius();
@@ -71,5 +91,6 @@ void calefaccion  (){
 }
 
 void loop() {
+  leer_sensor_ultrasonico();
   // put your main code here, to run repeatedly:
 }
